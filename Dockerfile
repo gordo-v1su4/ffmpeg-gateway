@@ -20,13 +20,15 @@ RUN uv pip install --system --no-cache -r requirements.txt
 
 COPY . .
 
-RUN useradd -r -s /bin/false appuser
-USER appuser
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN useradd -r -s /bin/false appuser \
+    && chmod +x /docker-entrypoint.sh
 
 EXPOSE 3200
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
     CMD curl -fsS --max-time 3 http://127.0.0.1:3200/health || exit 1
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3200"]
 
