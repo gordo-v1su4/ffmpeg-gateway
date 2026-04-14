@@ -1,3 +1,5 @@
+# linux/amd64: FFglitch binaries from https://ffglitch.org/pub/bin/linux64/
+# For ARM64, change the URL/dir to a linux-aarch64 build from https://ffglitch.org/pub/bin/
 FROM ubuntu:22.04
 
 RUN apt-get update && \
@@ -8,11 +10,21 @@ RUN apt-get update && \
     python3.11-venv \
     curl \
     ca-certificates \
+    unzip \
     && rm -rf /var/lib/apt/lists/* \
     && ln -sf /usr/bin/python3.11 /usr/bin/python \
     && ln -sf /usr/bin/python3.11 /usr/bin/python3 \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && mv /root/.local/bin/uv /usr/local/bin/uv
+
+RUN mkdir -p /opt/ffglitch \
+    && curl -fsSL -o /tmp/ffglitch.zip "https://ffglitch.org/pub/bin/linux64/ffglitch-0.10.2-linux-x86_64.zip" \
+    && unzip -q /tmp/ffglitch.zip -d /tmp \
+    && mv /tmp/ffglitch-0.10.2-linux-x86_64/* /opt/ffglitch/ \
+    && rm -rf /tmp/ffglitch.zip /tmp/ffglitch-0.10.2-linux-x86_64 \
+    && chmod +x /opt/ffglitch/ffedit /opt/ffglitch/ffgac /opt/ffglitch/qjs /opt/ffglitch/fflive
+
+ENV PATH="/opt/ffglitch:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 WORKDIR /app
 COPY requirements.txt .

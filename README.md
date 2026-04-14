@@ -56,6 +56,12 @@ Align compose labels with your Traefik static config: **`entrypoints=websecure`*
 | POST | `/ffglitch/replicate` | Re-encode with ffgac |
 | GET | `/internal/metrics` | Prometheus metrics (requires Bearer token) |
 
+## FFglitch (`ffedit` / `ffgac`)
+
+The Docker image installs **FFglitch 0.10.2** [linux x86_64 binaries](https://ffglitch.org/pub/bin/linux64/) under **`/opt/ffglitch`** and prepends that directory to **`PATH`**, so **`ffedit`** and **`ffgac`** work for `/ffglitch/*` routes without extra configuration. The archive also includes **`qjs`** (used by FFglitch) and **`fflive`** (not used by this API).
+
+**ARM64:** this zip is **amd64 only**; use a build from [linux-aarch64](https://ffglitch.org/pub/bin/linux-aarch64/) and adjust the `Dockerfile` download path if you deploy on ARM.
+
 ## Deploy
 
 ```bash
