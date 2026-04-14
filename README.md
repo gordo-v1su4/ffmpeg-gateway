@@ -2,6 +2,12 @@
 
 Media processing microservice for video/audio manipulation — standalone FastAPI Docker deployment.
 
+## Public URL (Traefik)
+
+Production base URL: **https://ffmpeg.v1su4.dev** (HTTPS via Traefik on the same host).
+
+DNS: point **`ffmpeg.v1su4.dev`** at this server’s public IP (explicit **A** record overrides a `*.v1su4.dev` wildcard that targets elsewhere). Override the hostname in **`.env`** with `PUBLIC_HOST` if you use a different name; it must match the Traefik router `Host()` rule and your TLS certificate.
+
 ## Endpoints
 
 | Method | Path | Description |
@@ -30,6 +36,7 @@ Media processing microservice for video/audio manipulation — standalone FastAP
 ```bash
 cp .env.example .env
 # Edit .env with your API_KEYS
+docker compose build 
 docker compose up -d
 ```
 

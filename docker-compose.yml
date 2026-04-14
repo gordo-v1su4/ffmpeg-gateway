@@ -31,7 +31,8 @@ services:
           memory: 256M
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ffmpeg-gateway.rule=Host(`ffmpeg.v1su4.dev`)"
+      # PUBLIC_HOST must match DNS (A/AAAA) for this VPS — see README
+      - "traefik.http.routers.ffmpeg-gateway.rule=Host(`${PUBLIC_HOST:-ffmpeg.v1su4.dev}`)"
       - "traefik.http.routers.ffmpeg-gateway.entrypoints=websecure"
       - "traefik.http.routers.ffmpeg-gateway.tls.certresolver=letsencrypt"
       - "traefik.http.services.ffmpeg-gateway.loadbalancer.server.port=3200"
