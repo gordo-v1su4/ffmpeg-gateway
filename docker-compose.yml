@@ -11,8 +11,9 @@ services:
       - API_KEYS=${API_KEYS:-}
       - METRICS_TOKEN=${METRICS_TOKEN:-}
       - MAX_UPLOAD_SIZE_MB=500
-      - FFMPEG_PATH=/usr/local/bin/ffmpeg
-      - FFPROBE_PATH=/usr/local/bin/ffprobe
+      # Defaults match Ubuntu apt; override in .env if needed
+      - FFMPEG_PATH=${FFMPEG_PATH:-/usr/bin/ffmpeg}
+      - FFPROBE_PATH=${FFPROBE_PATH:-/usr/bin/ffprobe}
       - FFEDIT_PATH=${FFEDIT_PATH:-ffedit}
       - FFGAC_PATH=${FFGAC_PATH:-ffgac}
     ports:

@@ -15,7 +15,7 @@ from fastapi import (
     Response,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
     Counter,
@@ -101,9 +101,19 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     ensure_dirs()
-    ffmpeg = await detect_ffmpeg()
-    ffprobe = await detect_ffprobe()
-    ffglitch = await detect_ffglitch()
+    try:
+        ffmpeg = await detect_ffmpeg()
+        ffprobe = await detect_ffprobe()
+        ffglitch = await detect_ffglitch()
+    except (FileNotFoundError, OSError) as e:
+        print(f"[ffmpeg-gateway] Tool probe failed (check FFMPEG_PATH / FFPROBE_PATH): {e}")
+        ffmpeg = {"available": False, "version": None}
+        ffprobe = {"available": False, "version": None}
+        ffglitch = {
+            "ffeditPath": None,
+            "ffgacPath": None,
+            "available": False,
+        }
     print(f"[ffmpeg-gateway] Listening on :{API_PORT}")
     print(
         f"[ffmpeg-gateway] FFmpeg:  {'v' + ffmpeg['version'] if ffmpeg['available'] else 'NOT FOUND'}"
@@ -167,9 +177,15 @@ async def save_upload(file: UploadFile) -> tuple[str, str]:
 
 @app.get("/health", tags=["System"])
 async def health():
-    ffmpeg = await detect_ffmpeg()
-    ffprobe = await detect_ffprobe()
-    ffglitch = await detect_ffglitch()
+    try:
+        ffmpeg = await detect_ffmpeg()
+        ffprobe = await detect_ffprobe()
+        ffglitch = await detect_ffglitch()
+    except Exception as e:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "error", "detail": str(e)},
+        )
     return {
         "status": "ok",
         "version": API_VERSION,
