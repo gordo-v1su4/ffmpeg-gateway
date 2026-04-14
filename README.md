@@ -21,6 +21,14 @@ Traefik’s **Docker provider** only sees containers on the **same network(s)** 
 docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
 ```
 
+If Compose says **`network traefik declared as external, but could not be found`**, the **`traefik`** Docker network does not exist yet. Do this **in order**:
+
+1. **Deploy Traefik** from Hostinger Docker Manager (or install Traefik with Compose yourself).
+2. Run **`docker network ls`** and find the network the Traefik container uses (it may **not** be named `traefik`; it is often `something_default` or `something_traefik`).
+3. Set **`TRAEFIK_NETWORK=<that exact name>`** in **`.env`**, then run the `docker compose -f ... -f docker-compose.traefik.yml up -d` command again.
+
+Creating an empty network with **`docker network create traefik`** only satisfies Compose if your real Traefik stack is also attached to a network **named** `traefik`; otherwise use the name from step 2, not a guess.
+
 Direct **`http://<server-ip>:3200/docs`** works without Traefik because port **3200** is published to the host. **`https://ffmpeg.v1su4.dev`** goes to **443** on Traefik, which must reverse-proxy to this container on the shared Docker network.
 
 Align compose labels with your Traefik static config: **`entrypoints=websecure`** and **`tls.certresolver=letsencrypt`** must match your real entrypoint and certificate resolver names.

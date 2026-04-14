@@ -175,7 +175,7 @@ async def save_upload(file: UploadFile) -> tuple[str, str]:
     return id_, dest
 
 
-@app.get("/health", tags=["System"])
+@app.api_route("/health", methods=["GET", "HEAD"], tags=["System"])
 async def health():
     try:
         ffmpeg = await detect_ffmpeg()
