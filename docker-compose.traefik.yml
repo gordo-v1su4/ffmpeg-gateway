@@ -1,0 +1,16 @@
+# Optional overlay: attach the API to Traefik's Docker network so labels are applied.
+# Usage on the VPS (after TRAEFIK_NETWORK matches `docker network ls`):
+#   docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d
+#
+# If `docker compose up` errors on "network ... declared as external but could not be found",
+# find Traefik's network, e.g.  docker inspect "$(docker ps -qf name=traefik)" --format '{{range $k, $_ := .NetworkSettings.Networks}}{{$k}} {{end}}'
+services:
+  api:
+    networks:
+      - ffmpeg-network
+      - traefik
+
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK:-traefik}
+    external: true
