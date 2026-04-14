@@ -1,7 +1,8 @@
-FROM linuxserver/ffmpeg:7.1-latest AS base
+FROM ubuntu:22.04
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    ffmpeg \
     python3.11 \
     python3.11-dev \
     python3.11-venv \
@@ -19,9 +20,13 @@ RUN uv pip install --system --no-cache -r requirements.txt
 
 COPY . .
 
+RUN useradd -r -s /bin/false appuser
+USER appuser
+
 EXPOSE 3200
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
     CMD curl -fsS --max-time 3 http://127.0.0.1:3200/health || exit 1
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3200"]
+
