@@ -9,6 +9,7 @@ services:
       - API_PORT=3200
       - CORS_ORIGINS=*
       - API_KEYS=${API_KEYS:-}
+      - FFMPEG_API_KEYS=${FFMPEG_API_KEYS:-}
       - METRICS_TOKEN=${METRICS_TOKEN:-}
       - MAX_UPLOAD_SIZE_MB=500
       # Defaults match Ubuntu apt; override in .env if needed

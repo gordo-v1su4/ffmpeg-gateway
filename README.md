@@ -66,7 +66,7 @@ The Docker image installs **FFglitch 0.10.2** [linux x86_64 binaries](https://ff
 
 ```bash
 cp .env.example .env
-# Edit .env with your API_KEYS, PUBLIC_HOST, TRAEFIK_NETWORK (VPS + Traefik)
+# Edit .env with your FFMPEG_API_KEYS (or legacy API_KEYS), PUBLIC_HOST, TRAEFIK_NETWORK (VPS + Traefik)
 docker compose build
 docker compose up -d
 # With Traefik on the same host (see "Public URL" above):
@@ -82,5 +82,4 @@ uvicorn main:app --reload --port 3200
 
 ## Auth
 
-Set `API_KEYS` env var with comma-separated keys. Requests must include `X-API-Key` header.
-If `API_KEYS` is empty/unset, auth is disabled (all requests pass).
+Set **`FFMPEG_API_KEYS`** (preferred) or **`API_KEYS`** (legacy) to a comma-separated list. Requests must include the **`X-API-Key`** header. If both are empty/unset, auth is disabled (all requests pass).

@@ -6,10 +6,12 @@ from fastapi.security import APIKeyHeader
 
 
 def load_api_keys() -> Set[str]:
-    keys_str = os.getenv("API_KEYS", "")
-    if not keys_str:
-        return set()
-    keys = set(key.strip() for key in keys_str.split(",") if key.strip())
+    """Comma-separated keys from FFMPEG_API_KEYS (preferred) and/or API_KEYS (legacy)."""
+    keys: Set[str] = set()
+    for env_name in ("FFMPEG_API_KEYS", "API_KEYS"):
+        raw = os.getenv(env_name, "")
+        if raw:
+            keys.update(k.strip() for k in raw.split(",") if k.strip())
     return keys
 
 
