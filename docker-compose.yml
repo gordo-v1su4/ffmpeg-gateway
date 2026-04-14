@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: .
+    container_name: ffmpeg-gateway
+    restart: unless-stopped
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=3200
+      - CORS_ORIGINS=*
+      - API_KEYS=${API_KEYS:-}
+      - METRICS_TOKEN=${METRICS_TOKEN:-}
+      - MAX_UPLOAD_SIZE_MB=500
+      - FFMPEG_PATH=/usr/local/bin/ffmpeg
+      - FFPROBE_PATH=/usr/local/bin/ffprobe
+      - FFEDIT_PATH=${FFEDIT_PATH:-ffedit}
+      - FFGAC_PATH=${FFGAC_PATH:-ffgac}
+    ports:
+      - "3200:3200"
+    volumes:
+      - ffmpeg-gateway-work:/tmp/ffmpeg-gateway-work
+    networks:
+      - ffmpeg-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ffmpeg-gateway.rule=Host(`ffmpeg.v1su4.dev`)"
+      - "traefik.http.routers.ffmpeg-gateway.entrypoints=websecure"
+      - "traefik.http.routers.ffmpeg-gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ffmpeg-gateway.loadbalancer.server.port=3200"
+
+networks:
+  ffmpeg-network:
+    driver: bridge
+
+volumes:
+  ffmpeg-gateway-work:
