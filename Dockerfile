@@ -19,6 +19,7 @@ COPY --from=ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/ffprobe /usr/bin/
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    libsdl2-2.0-0 libasound2 libdrm2 libxcb1 \
     python3.11 \
     python3.11-dev \
     python3.11-venv \
