@@ -52,6 +52,28 @@ def sanitize_filename(value: str) -> str:
     )
 
 
+# The binaries can't change while the container runs, so each check runs once and is
+# reused. /health is polled every 10 s; without this it started four processes each time.
+# Only a successful result is kept, so a check that failed is tried again next call.
+_detected: dict[str, dict] = {}
+
+
+def _cached(name: str):
+    def wrap(fn):
+        async def inner() -> dict:
+            if name in _detected:
+                return dict(_detected[name])
+            result = await fn()
+            if result.get("available"):
+                _detected[name] = result
+            return dict(result)
+
+        return inner
+
+    return wrap
+
+
+@_cached("ffmpeg")
 async def detect_ffmpeg() -> dict:
     stdout, _, rc = await run([FFMPEG_PATH, "-version"])
     if rc != 0:
@@ -60,6 +82,7 @@ async def detect_ffmpeg() -> dict:
     return {"available": True, "version": match.group(1) if match else None}
 
 
+@_cached("ffprobe")
 async def detect_ffprobe() -> dict:
     stdout, _, rc = await run([FFPROBE_PATH, "-version"])
     if rc != 0:
@@ -68,6 +91,7 @@ async def detect_ffprobe() -> dict:
     return {"available": True, "version": match.group(1) if match else None}
 
 
+@_cached("ffglitch")
 async def detect_ffglitch() -> dict:
     ffedit_ok = False
     ffgac_ok = False
